@@ -8,13 +8,21 @@ use Tests\TestCase;
 
 class TagsControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /**
-     * A basic feature test example.
+     * @test
      */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
-
+    public function it_can_lists_tags(){
+        $response = $this->get('api/tags');
         $response->assertStatus(200);
+        $response->assertJsonCount(3,'data');
+        $response->assertJsonStructure([
+            'data'=> [
+                [
+                    'id',
+                    'name'
+                ]
+            ]
+        ]);
     }
 }

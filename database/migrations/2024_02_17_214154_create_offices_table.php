@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-        Schema::create('offices_tags',function (Blueprint $table) {
+        Schema::create('office_tag',function (Blueprint $table) {
             $table->foreignId('tag_id')->constraind('tags');
             $table->foreignId('office_id')->constraind('offices');
             $table->unique(['tag_id','office_id']);
@@ -39,7 +39,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('offices_tags');
+        Schema::dropIfExists('office_tag');
         Schema::dropIfExists('offices');
     }
 };

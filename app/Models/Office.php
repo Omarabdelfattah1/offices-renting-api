@@ -23,13 +23,17 @@ class Office extends Model
         'monthly_discount'
     ];
     protected $casts = [
-        'lat' => 'decimal',
-        'lng'=> 'decimal',
+        'lat' => 'decimal:8',
+        'lng'=> 'decimal:8',
         'approval_status'=> 'integer',
         'hidden'=> 'bool',
         'price_per_day'=> 'float',
         'monthly_discount'=> 'float',
     ];
+    const APPROVAL_APPROVED = 1;
+    const APPROVAL_PENDING = 2;
+    const APPROVAL_REJECTED = 3;
+
     public function user(){
         return $this->belongsTo(User::class);
     }
@@ -37,6 +41,9 @@ class Office extends Model
         return $this->hasMany(Reservation::class);
     }
     public function images(){
-        return $this->morphMany(Image::class,'resource');\
+        return $this->morphMany(Image::class,'resource');
+    }
+    public function tags(){
+        return $this->belongsToMany(Tag::class);
     }
 }

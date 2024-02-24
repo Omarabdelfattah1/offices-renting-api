@@ -18,16 +18,15 @@ class OfficeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
+            'user_id' => User::factory()->create()->id,
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'lat' => $this->faker->latitude,
             'lng' => $this->faker->longitude,
             'address_line1' => $this->faker->address,
-            'approval_status' => 2,
+            'approval_status' => 1,
             'hidden' => false,
-            'price_per_day' => $this->faker->numberBetween(1000,2000),
-            'hidden' => 0,
+            'price_per_day' => $this->faker->randomFloat(2,1000,2000)
         ];
     }
 }

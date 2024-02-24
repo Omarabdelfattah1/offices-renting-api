@@ -12,7 +12,7 @@ class TagsController extends Controller
 {
     use ApiResponce;
     public function __invoke(){
-        $tags = Tag::orderBy("name")->all();
+        $tags = Tag::orderBy("name")->get();
         return $this->successWithData(TagResource::collection($tags));
     }
 }

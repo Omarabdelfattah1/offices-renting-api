@@ -22,6 +22,9 @@ class Reservation extends Model
         'start_date' =>'immutable_date',
         'end_date' =>'immutable_date',
     ];
+    const STATUS_PENDING = 1;
+    const STATUS_ACTIVE = 2;
+    const STATUS_CANCELED = 3;
     public function user(){
         return $this->belongsTo(User::class);
     }

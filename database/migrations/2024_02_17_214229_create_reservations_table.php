@@ -18,7 +18,6 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->tinyInteger('status')->default(1);
-            $table->boolean('hidden')->default(false);
             $table->float('price');
             $table->timestamps();
         });
