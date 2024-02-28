@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Database\Eloquent\Builder;
 class Office extends Model
 {
     use HasFactory,SoftDeletes;
@@ -45,5 +46,9 @@ class Office extends Model
     }
     public function tags(){
         return $this->belongsToMany(Tag::class);
+    }
+    public function scopeNearestFirst(Builder $query, $latitude, $longitude){
+        return $query->select()->selectRaw('SQRT(POW(69.1*(lat-?),2)+POW(69.1*(?-lng)*COS(lat/57.3),2)) AS distance'
+        ,[$latitude,$longitude])->orderBy('distance');
     }
 }

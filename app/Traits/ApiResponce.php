@@ -15,7 +15,7 @@ trait ApiResponce {
             'data' => $data
         ],$status);
     }
-    public function error($message,$status=422) {
+    public function error($message,$status=422,$exception=null) {
         return response([
             'success' => false,
             'message' => $message,

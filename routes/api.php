@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get("/tags", 'TagsController');
-Route::get("/offices",'OfficesController@index');
+Route::get("offices",'OfficesController@index');
+Route::get("offices/{office}",'OfficesController@show');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource("offices",'OfficesController')->except(['index','show']);
+});
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
