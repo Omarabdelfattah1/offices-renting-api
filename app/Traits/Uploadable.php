@@ -14,12 +14,12 @@ trait Uploadable{
      * @param string|null $disk
      * @return string|false
      */
-    public static function uploadFile(UploadedFile $file, string $path='uploads', string $fileName = null, string $disk = null)
+    public static function uploadFile(UploadedFile $file, string $path='', string $fileName = null, string $disk = null)
     {
         $fileName = $fileName ?: $file->getClientOriginalName();
         $disk = $disk ?: config('filesystems.default');
 
-        return $file->storeAs($path, $fileName, ['disk' => $disk]);
+        return 'uploads/'.$file->storeAs($path, $fileName, ['disk' => $disk]);
     }
     /**
      * Upload multiple files to the specified path.
@@ -30,7 +30,7 @@ trait Uploadable{
      * @param array $extraData
      * @return array
      */
-    public static function uploadMultipleFiles(array $files, string $path ='uploads', string $disk = null, array $extraData = [])
+    public static function uploadMultipleFiles(array $files, string $path ='', string $disk = null, array $extraData = [])
     {
         $paths = [];
 

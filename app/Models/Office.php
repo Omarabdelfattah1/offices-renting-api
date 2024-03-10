@@ -14,6 +14,7 @@ class Office extends Model
         'user_id',
         'title',
         'description',
+        'featured_image_id',
         'lat',
         'lng',
         'address_line1',

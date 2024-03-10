@@ -7,15 +7,35 @@ use App\Models\Office;
 use App\Models\Reservation;
 use App\Models\Tag;
 use App\Models\User;
+use App\Notifications\OfficePendingNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class OfficesControllerTest extends TestCase
 {
     use RefreshDatabase;
+    /**
+     * @test
+     */
+    public function it_lists_all_offices_for_current_user(){
+        $host = User::factory()->create();
+        $this->actingAs($host);
+        Office::factory()->count(3)->create(["user_id"=> $host->id,"approval_status"=> Office::APPROVAL_PENDING]);
+        Office::factory()->count(3)->create(["user_id"=> $host->id,"hidden" =>true]);
+        Office::factory()->create(["user_id"=> $host->id,'approval_status'=>Office::APPROVAL_APPROVED]);
+        $response = $this->get('api/offices?user_id='.$host->id);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data'=> [
+                'data',
+            ]
+        ]);
+        $response->assertJsonCount(7,'data.data');
+    }
     /**
      * @test
      */
@@ -60,7 +80,7 @@ class OfficesControllerTest extends TestCase
         $office = Office::factory()->create(["user_id"=> $host->id]);
         $office2 = Office::factory()->create(["user_id"=> $host->id]);
         Reservation::factory()->create(["user_id"=> $user->id,"office_id"=> $office->id]);
-        $response = $this->get('api/offices?user_id='. $user->id);
+        $response = $this->get('api/offices?visitor_id='. $user->id);
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data'=> [
@@ -149,12 +169,13 @@ class OfficesControllerTest extends TestCase
         $user = User::factory()->create();
         $office = Office::factory()->make()->toArray();
         $office['tags'] = Tag::factory(3)->create()->pluck('id')->toArray();
-        Storage::fake('public');
+        Storage::fake('assets');
         $office['images'] = [
             UploadedFile::fake()->create('image.png',100),
             UploadedFile::fake()->create('image1.png',100),
             UploadedFile::fake()->create('image2.png',100),
         ];
+        Notification::fake();
         $response = $this->post('api/offices', $office,[
             'Authorization' => 'Bearer '.$user->createToken('test')->plainTextToken
         ]);
@@ -162,5 +183,101 @@ class OfficesControllerTest extends TestCase
         $this->assertEquals($office['title'],$response->json()['data']['title']);
         $response->assertJsonCount(3,'data.images');
         $response->assertJsonCount(3,'data.tags');
+        Notification::assertSentTo(User::where('role',User::ROLE_SUPPER_ADMIN)->first(),OfficePendingNotification::class);
+
+    }
+    /**
+     * @test
+     */
+    public function it_cant_update_others_office(){
+        $host = User::factory()->create();
+        $host2 = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host->id]);
+        $tags = Tag::factory(2)->create();
+        $office->tags()->attach($tags);
+        $office->images()->create(['path'=> 'image.jpg']);
+
+        $officeUpdated = Office::factory()->make()->toArray();
+        $response = $this->putJson('api/offices/'.$office->id, $officeUpdated,[
+            'Authorization' => 'Bearer '.$host2->createToken('test')->plainTextToken
+        ]);
+
+        $response->assertStatus(403);
+    }
+    /**
+     * @test
+     */
+    public function it_updates_office(){
+        $host = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host->id]);
+        $tags = Tag::factory(2)->create();
+        $office->tags()->attach($tags);
+        $office->images()->create(['path'=> 'image.jpg']);
+
+        $officeUpdated = Office::factory()->make()->toArray();
+        $officeUpdated['tags'] = [Tag::factory()->create()->id,$tags->first()->id];
+        Storage::fake('public');
+        Notification::fake();
+        $officeUpdated['images'] = [
+            UploadedFile::fake()->create('image.png',100),
+            UploadedFile::fake()->create('image1.png',100),
+            UploadedFile::fake()->create('image2.png',100),
+        ];
+        $response2 = $this->putJson('api/offices/'.$office->id, $officeUpdated,[
+            'Authorization' => 'Bearer '.$host->createToken('test')->plainTextToken
+        ]);
+        $response2->assertOk();
+        $this->assertEquals($officeUpdated['title'],$response2->json()['data']['title']);
+        $response2->assertJsonCount(4,'data.images');
+        $response2->assertJsonCount(2,'data.tags');
+        $this->assertContains($response2->json()['data']['tags'][0]['id'], $officeUpdated['tags']);
+        $this->assertContains($response2->json()['data']['tags'][1]['id'], $officeUpdated['tags']);
+        Notification::assertSentTo(User::where('role',User::ROLE_SUPPER_ADMIN)->first(),OfficePendingNotification::class);
+    }
+    /**
+     * @test
+     */
+    public function it_cant_delete_office_with_active_reservations(){
+        $host = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host->id]);
+        Reservation::factory()->create(["office_id"=> $office->id]);
+        $response = $this->deleteJson('api/offices/'.$office->id,[],[
+            'Authorization' => 'Bearer '.$host->createToken('test')->plainTextToken
+        ]);
+        $response->assertStatus(422);
+    }
+    /**
+     * @test
+     */
+    public function it_cant_delete_office_for_other_users(){
+        $host = User::factory()->create();
+        $host2 = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host2->id]);
+        $response = $this->deleteJson('api/offices/'.$office->id,[],[
+            'Authorization' => 'Bearer '.$host->createToken('test')->plainTextToken
+        ]);
+        $response->assertStatus(403);
+    }
+    /**
+     * @test
+     */
+    public function it_delete_offices(){
+        $host = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host->id]);
+        $response = $this->deleteJson('api/offices/'.$office->id,[],[
+            'Authorization' => 'Bearer '.$host->createToken('test')->plainTextToken
+        ]);
+        $response->assertStatus(200);
+    }
+    /**
+     * @test
+     */
+    public function it_allows_admin_to_delete_offices(){
+        $host = User::factory()->create();
+        $office = Office::factory()->create(["user_id"=> $host->id]);
+        $response = $this->deleteJson('api/offices/'.$office->id,[],[
+            'Authorization' => 'Bearer '.User::where('role',User::ROLE_SUPPER_ADMIN)->first()->createToken('test')->plainTextToken
+        ]);
+        $response->assertStatus(200);
     }
 }

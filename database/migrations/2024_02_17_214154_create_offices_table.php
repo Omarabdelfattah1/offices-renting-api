@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('hidden')->default(false);
             $table->float('price_per_day');
             $table->float('monthly_discount')->default(0);
+            $table->unsignedBigInteger('featured_image_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

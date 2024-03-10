@@ -20,6 +20,6 @@ trait ApiResponce {
             'success' => false,
             'message' => $message,
             'status' => $status
-        ]);
+        ],$status);
     }
 }

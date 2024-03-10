@@ -42,6 +42,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    const ROLE_SUPPER_ADMIN = 1;
+    const ROLE_USER = 2;
+    const ROLE_OWNWER = 3;
     public function offices(){
         return $this->hasMany(Office::class);
     }
