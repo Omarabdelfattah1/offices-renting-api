@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Image;
+use App\Models\Office;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -30,5 +31,16 @@ class OfficeFactory extends Factory
             'price_per_day' => $this->faker->randomFloat(2,1000,2000),
             'monthly_discount' => rand(1,90),
         ];
+    }
+
+    public function configure(){
+        return $this->afterCreating(function (Office $office) {
+            $feaured = $office->images()->create([
+                'path' => 'image.png'
+            ]);
+            $office->update([
+                'featured_image_id' => $feaured->id,
+            ]);
+        });
     }
 }

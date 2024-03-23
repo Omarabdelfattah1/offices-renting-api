@@ -20,7 +20,7 @@ class ReservationFactory extends Factory
     {
         return [
             'user_id' => User::factory()->create()->id,
-            'office_id' => Office::inRandomOrder()->first()->id,
+            'office_id' => Office::factory()->create()->id,
             'status' => 1,
             'price' => $this->faker->numberBetween(10000,20000),
             'start_date' => now()->addDays(1)->format('Y-m-d'),

@@ -1,10 +1,10 @@
 <?php
 namespace App\Traits;
 trait ApiResponce {
-    public function success($message,$status=200) {
+    public function success($message = '',$status=200) {
         return response([
             'success' => true,
-            'message' => $message,
+            'message' => $message ?? trans('response.success'),
             'status' => $status
         ],$status);
     }
@@ -15,10 +15,10 @@ trait ApiResponce {
             'data' => $data
         ],$status);
     }
-    public function error($message,$status=422,$exception=null) {
+    public function error($message= '',$status=422,$exception=null) {
         return response([
             'success' => false,
-            'message' => $message,
+            'message' => $message ?? trans('response.error'),
             'status' => $status
         ],$status);
     }

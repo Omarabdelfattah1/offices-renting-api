@@ -17,6 +17,7 @@ class OfficeResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'featured_image_id' => $this->featured_image_id,
             'title' => $this->title,
             'description' => $this->description,
             'lat' => $this->lat,
