@@ -79,17 +79,18 @@ class ReservationsControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $from = now()->subDays(1);
-        $to = now()->addWeek();
-        Reservation::factory()->create(['start_date'=>now()->subWeek(),'end_date'=>now()->subDays(3)]);
+        $to = now()->addDays(7);
+        Reservation::factory()->create(['start_date'=>now()->subDays(7),'end_date'=>now()->subDays(3)]);
         $reservation1 = Reservation::factory()->create(['start_date'=>now()->subDays(2),'end_date'=>$from]);
         $reservation2 = Reservation::factory()->create(['start_date'=>now(),'end_date'=>$to]);
-        Reservation::factory()->create(['start_date'=>now()->addDays(8),'end_date'=>now()->addWeeks(2)]);
+        $reservation3 = Reservation::factory()->create(['start_date'=> now()->subDays(2),'end_date'=>now()->addDays(8)]);
+        Reservation::factory()->create(['start_date'=>now()->addDays(8),'end_date'=>now()->addDays(14)]);
         $this->actingAs($user);
         $from = $from->format('Y-m-d');
         $to = $to->format('Y-m-d');
         $response = $this->get("/api/reservations?from_time=$from&to_time=$to");
         $response->assertOk();
-        $response->assertJsonCount(2,"data.data");
+        $response->assertJsonCount(3,"data.data");
         $response->assertJson([
             'success' => true,
             'status' => 200,
@@ -97,6 +98,7 @@ class ReservationsControllerTest extends TestCase
                 "data" => [
                     ["id" => $reservation1->id],
                     ["id" => $reservation2->id],
+                    ["id" => $reservation3->id],
                 ]
             ]
         ]);
@@ -144,17 +146,18 @@ class ReservationsControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $from = now()->subDays(1);
-        $to = now()->addWeek();
-        Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->subWeek(),'end_date'=>now()->subDays(3)]);
+        $to = now()->addDays(7);
+        Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->subDays(7),'end_date'=>now()->subDays(3)]);
         $reservation1 = Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->subDays(2),'end_date'=>$from]);
         $reservation2 = Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now(),'end_date'=>$to]);
-        Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->addDays(8),'end_date'=>now()->addWeeks(2)]);
+        $reservation3 = Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->subDays(2),'end_date'=>now()->addDays(8)]);
+        Reservation::factory()->create(['user_id'=> $user->id,'start_date'=>now()->addDays(8),'end_date'=>now()->addDays(14)]);
         $this->actingAs($user);
         $from = $from->format('Y-m-d');
         $to = $to->format('Y-m-d');
         $response = $this->get("/api/my-reservations?from_time=$from&to_time=$to");
         $response->assertOk();
-        $response->assertJsonCount(2,"data.data");
+        $response->assertJsonCount(3,"data.data");
         $response->assertJson([
             'success' => true,
             'status' => 200,
@@ -162,6 +165,7 @@ class ReservationsControllerTest extends TestCase
                 "data" => [
                     ["id" => $reservation1->id],
                     ["id" => $reservation2->id],
+                    ["id" => $reservation3->id],
                 ]
             ]
         ]);
@@ -212,17 +216,18 @@ class ReservationsControllerTest extends TestCase
         $host = User::factory()->create();
         $office = Office::factory()->create(['user_id'=> $host->id]);
         $from = now()->subDays(1);
-        $to = now()->addWeek();
+        $to = now()->addDays(7);
         Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now()->subWeek(),'end_date'=>now()->subDays(3)]);
         $reservation1 = Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now()->subDays(2),'end_date'=>$from]);
         $reservation2 = Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now(),'end_date'=>$to]);
-        Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now()->addDays(8),'end_date'=>now()->addWeeks(2)]);
+        $reservation3 = Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now()->subDays(2),'end_date'=>now()->addDays(8)]);
+        Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now()->addDays(8),'end_date'=>now()->addDays(14)]);
         $this->actingAs($host);
         $from = $from->format('Y-m-d');
         $to = $to->format('Y-m-d');
         $response = $this->get("/api/office-reservations?from_time=$from&to_time=$to");
         $response->assertOk();
-        $response->assertJsonCount(2,"data.data");
+        $response->assertJsonCount(3,"data.data");
         $response->assertJson([
             'success' => true,
             'status' => 200,
@@ -230,8 +235,68 @@ class ReservationsControllerTest extends TestCase
                 "data" => [
                     ["id" => $reservation1->id],
                     ["id" => $reservation2->id],
+                    ["id" => $reservation3->id],
                 ]
             ]
         ]);
+    }
+    /**
+     * @test
+     */
+    public function it_dosnt_makes_reservations_if_office_not_available(): void
+    {
+        $user = User::factory()->create();
+        $office = Office::factory()->create();
+        $from = now()->subDays(1);
+        $to = now()->addWeek();
+        Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now(),'end_date'=>$to,'status'=> Reservation::STATUS_ACTIVE]);
+        $this->actingAs($user);
+        $from = $from->format('Y-m-d');
+        $to = $to->format('Y-m-d');
+        $response = $this->post("/api/reservations",[
+            'office_id' => $office->id,
+            'start_date' => $from,
+            'end_date' => $to,
+        ]);
+        $response->assertSessionHasErrors(['office_id']);
+    }
+    /**
+     * @test
+     */
+    public function it_dosnt_makes_reservations_if_office_belongs_to_current_user(): void
+    {
+        $user = User::factory()->create();
+        $office = Office::factory()->create(['user_id'=>$user->id]);
+        $from = now()->subDays(1);
+        $to = now()->addWeek();
+        Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now(),'end_date'=>$to,'status'=> Reservation::STATUS_ACTIVE]);
+        $this->actingAs($user);
+        $from = $from->format('Y-m-d');
+        $to = $to->format('Y-m-d');
+        $response = $this->post("/api/reservations",[
+            'office_id' => $office->id,
+            'start_date' => $from,
+            'end_date' => $to,
+        ]);
+        $response->assertSessionHasErrors(['office_id']);
+    }
+    /**
+     * @test
+     */
+    public function it_makes_reservations(): void
+    {
+        $user = User::factory()->create();
+        $office = Office::factory()->create();
+        $from = now()->subDays(1);
+        $to = now()->addWeek();
+        $this->actingAs($user);
+        $from = $from->format('Y-m-d');
+        $to = $to->format('Y-m-d');
+        $response = $this->post("/api/reservations",[
+            'office_id' => $office->id,
+            'start_date' => $from,
+            'end_date' => $to,
+        ]);
+        $response->assertOk();
     }
 }

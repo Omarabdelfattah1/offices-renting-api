@@ -15,11 +15,12 @@ trait ApiResponce {
             'data' => $data
         ],$status);
     }
-    public function error($message= '',$status=422,$exception=null) {
+    public function error($message= '',$status=422,$exception=null,$errors = []) {
         return response([
             'success' => false,
             'message' => $message ?? trans('response.error'),
-            'status' => $status
+            'status' => $status,
+            'errors' => $errors
         ],$status);
     }
 }

@@ -32,20 +32,32 @@ class Reservation extends Model
         return $this->belongsTo(Office::class);
     }
     public function scopeFilterd($q){
-        return $q->when(request('user_id'),fn($q)=> $q->where('user_id', request('user_id')))
-        ->when(request('office_id'),fn($q) => $q->where('office_id',request('office_id')))
-        ->when(request('from_time') && request('to_time'),
-        function($q){
-            return $q->where(function($q){
-                return $q->where(function($q){
-                    return $q->where('start_date','>=',request('from_time'))
-                    ->where('start_date','<=',request('to_time'));
-                })->orWhere(function($q){
-                    return $q->where('end_date','<=',request('to_time'))
-                    ->where('end_date','>=',request('from_time'));
-                });
-            });
-        })
-        ->when(request('status'),fn($q) => $q->where('status',request('status')));
+        return $q->filterdByOfficeId(request('office_id'))
+        ->filterdByStatus(request('status'))
+        ->filterdByTime(request('from_time'),request('to_time'));
+    }
+    public function scopeFilterdByTime($q,$from_time,$to_time){
+
+        return $q->when($from_time && $to_time,
+                    function($q) use($from_time,$to_time){
+                        return $q->where(function($q) use($from_time,$to_time){
+                            return $q->where(function($q) use($from_time,$to_time){
+                                return $q->where('start_date','>=',$from_time)
+                                ->where('start_date','<=',$to_time);
+                            })->orWhere(function($q) use($from_time,$to_time){
+                                return $q->where('end_date','<=',$to_time)
+                                ->where('end_date','>=',$from_time);
+                            })->orWhere(function($q) use($from_time,$to_time){
+                                return $q->where('start_date','<=',$from_time)
+                                ->where('end_date','>=',$to_time);
+                            });
+                        });
+                    });
+    }
+    public function scopeFilterdByOfficeId($q,$office_id){
+        return $q->when($office_id,fn($q) => $q->where('office_id',$office_id));
+    }
+    public function scopeFilterdByStatus($q,$status){
+        return $q->when($status,fn($q) => $q->where('status',$status));
     }
 }
