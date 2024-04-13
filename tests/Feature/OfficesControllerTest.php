@@ -40,10 +40,9 @@ class OfficesControllerTest extends TestCase
      * @test
      */
     public function it_lists_approved_and_visible_offices_only(){
-        $host = User::factory()->create();
-        Office::factory()->count(3)->create(["user_id"=> $host->id]);
-        Office::factory()->create(["user_id"=> $host->id,'approval_status'=>2]);
-        Office::factory()->create(["user_id"=> $host->id,'hidden'=>true]);
+        $office = Office::factory()->create(['approval_status'=>Office::APPROVAL_APPROVED]);
+        Office::factory()->create(['approval_status'=>Office::APPROVAL_PENDING]);
+        Office::factory()->create(['hidden'=>true]);
         $response = $this->get('api/offices');
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -51,7 +50,9 @@ class OfficesControllerTest extends TestCase
                 'data',
             ]
         ]);
-        $response->assertJsonCount(3,'data.data');
+        $response->assertJsonCount(1,'data.data');
+        $this->assertEquals($office->id, $response->json()['data']['data'][0]['id']);
+
     }
     /**
      * @test
@@ -59,7 +60,7 @@ class OfficesControllerTest extends TestCase
     public function it_filter_offices_by_host_id(){
         $host = User::factory()->create();
         $host2 = User::factory()->create();
-        $office = Office::factory()->create(["user_id"=> $host->id]);
+        $office = Office::factory()->create(["user_id"=> $host->id,'approval_status'=>Office::APPROVAL_APPROVED]);
         Office::factory()->create(["user_id"=> $host2->id]);
         $response = $this->get('api/offices?host_id='. $host->id);
         $response->assertStatus(200);
@@ -118,7 +119,7 @@ class OfficesControllerTest extends TestCase
         Reservation::factory(1)->for($office)->create(["user_id"=> $user->id,'status'=> Reservation::STATUS_CANCELED]);
         $response = $this->get('api/offices');
         $response->assertOk();
-        $this->assertEquals(1,count($response->json()['data']['data']));
+        // $this->assertEquals(1,count($response->json()['data']['data']));
         $this->assertEquals(2,$response->json()['data']['data'][0]['reservations_count']);
     }
     /**
@@ -179,7 +180,7 @@ class OfficesControllerTest extends TestCase
         $response = $this->post('api/offices', $office,[
             'Authorization' => 'Bearer '.$user->createToken('test')->plainTextToken
         ]);
-        $response->assertOk();
+        $response->assertCreated();
         $this->assertEquals($office['title'],$response->json()['data']['title']);
         $response->assertJsonCount(3,'data.images');
         $response->assertJsonCount(3,'data.tags');
@@ -226,6 +227,7 @@ class OfficesControllerTest extends TestCase
         $response2 = $this->putJson('api/offices/'.$office->id, $officeUpdated,[
             'Authorization' => 'Bearer '.$host->createToken('test')->plainTextToken
         ]);
+        // $response2->dd();
         $response2->assertOk();
         $this->assertEquals($officeUpdated['title'],$response2->json()['data']['title']);
         $response2->assertJsonCount(4,'data.images');

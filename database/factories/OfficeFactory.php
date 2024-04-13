@@ -26,7 +26,7 @@ class OfficeFactory extends Factory
             'lat' => $this->faker->latitude,
             'lng' => $this->faker->longitude,
             'address_line1' => $this->faker->address,
-            'approval_status' => 1,
+            'approval_status' => Office::APPROVAL_APPROVED,
             'hidden' => false,
             'price_per_day' => $this->faker->randomFloat(2,1000,2000),
             'monthly_discount' => rand(1,90),
@@ -35,12 +35,12 @@ class OfficeFactory extends Factory
 
     public function configure(){
         return $this->afterCreating(function (Office $office) {
-            $feaured = $office->images()->create([
-                'path' => 'image.png'
-            ]);
-            $office->update([
-                'featured_image_id' => $feaured->id,
-            ]);
+            // $feaured = $office->images()->create([
+            //     'path' => 'image.png'
+            // ]);
+            // $office->update([
+            //     'featured_image_id' => $feaured->id,
+            // ]);
         });
     }
 }

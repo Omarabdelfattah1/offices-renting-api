@@ -243,7 +243,7 @@ class ReservationsControllerTest extends TestCase
     /**
      * @test
      */
-    public function it_dosnt_makes_reservations_if_office_not_available(): void
+    public function it_dosnt_make_reservations_if_office_not_available(): void
     {
         $user = User::factory()->create();
         $office = Office::factory()->create();
@@ -258,18 +258,17 @@ class ReservationsControllerTest extends TestCase
             'start_date' => $from,
             'end_date' => $to,
         ]);
-        $response->assertSessionHasErrors(['office_id']);
+        $response->assertSessionHasErrors(['office_id' => trans('validation.office_not_available')]);
     }
     /**
      * @test
      */
-    public function it_dosnt_makes_reservations_if_office_belongs_to_current_user(): void
+    public function it_dosnt_make_reservations_if_office_belongs_to_current_user(): void
     {
         $user = User::factory()->create();
         $office = Office::factory()->create(['user_id'=>$user->id]);
         $from = now()->subDays(1);
         $to = now()->addWeek();
-        Reservation::factory()->create(['office_id'=> $office->id,'start_date'=>now(),'end_date'=>$to,'status'=> Reservation::STATUS_ACTIVE]);
         $this->actingAs($user);
         $from = $from->format('Y-m-d');
         $to = $to->format('Y-m-d');
@@ -278,7 +277,7 @@ class ReservationsControllerTest extends TestCase
             'start_date' => $from,
             'end_date' => $to,
         ]);
-        $response->assertSessionHasErrors(['office_id']);
+        $response->assertSessionHasErrors(['office_id' => trans('validation.cant make reservation to your office')]);
     }
     /**
      * @test

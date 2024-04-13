@@ -33,7 +33,7 @@ class OfficeFormRequestValidation extends FormRequest
             'price_per_day' =>[ 'required','numeric'],
             'monthly_discount' =>[ 'required','numeric'],
             'tags'=>[ 'array'],
-            'featured_image_id' => 'nullable|integer|exists:images,id',
+            'featured_image_id' => ['nullable','integer','exists:images,id'],
             'tags.*'=>[ 'required','integer'],
             'images'=>[ 'array'],
             'images.*'=>[ 'required','image'],

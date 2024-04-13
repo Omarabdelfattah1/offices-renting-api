@@ -40,8 +40,8 @@ class ImagesController extends Controller
         if($is_only_image){
             return $this->error(trans("validation.it has no other models",["model" => substr($resource_type,0,strlen($resource_type) -1)]));
         }
-        $model = DB::table($resource_type)->wheres("id", $resource_id)->first();
-        if($model->is_featured_id == $image->id){
+        $model = DB::table($resource_type)->where("id", $resource_id)->first();
+        if($model->featured_image_id == $image->id){
             return $this->error(trans("validation.it is featured"));
         }
         Storage::delete($image->path);
