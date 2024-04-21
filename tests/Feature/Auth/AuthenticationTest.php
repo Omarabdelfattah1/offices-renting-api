@@ -12,11 +12,11 @@ class AuthenticationTest extends TestCase
     /**
      * @test
      */
-    public function test_users_can_login(): void
+    public function it_can_login(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->post('/login', [
+        $response = $this->post('api/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
@@ -30,7 +30,7 @@ class AuthenticationTest extends TestCase
     /**
      * @test
      */
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function it_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();
 
@@ -45,7 +45,7 @@ class AuthenticationTest extends TestCase
     /**
      * @test
      */
-    public function test_users_can_logout(): void
+    public function it_can_logout(): void
     {
         $user = User::factory()->create();
         $token = $user->createToken('new-token')->plainTextToken;
