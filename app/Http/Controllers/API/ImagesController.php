@@ -16,7 +16,6 @@ class ImagesController extends Controller
     use Uploadable;
     public function __construct(){
         if(!in_array(request()->route('resource_type'),Image::TYPES)|| (!is_int(request()->route('resource_id'))&& !ctype_digit(request()->route('resource_id')))){
-            dd(request()->route('resource_type'),request()->route('resource_id'));
             abort(404);
         }
     }

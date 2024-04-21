@@ -14,15 +14,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
+            $table->string('email')->nullable()->unique();
+            $table->string('phone')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('role')->default(User::ROLE_USER);
             $table->rememberToken();
             $table->timestamps();
         });
-        User::factory()->create(['name' => 'Super Admin','email'=>'admin@admin.com','role'=> User::ROLE_SUPPER_ADMIN]);
+        User::factory()->create(['first_name' => 'Super','last_name' => 'Admin','email'=>'admin@admin.com','role'=> User::ROLE_SUPPER_ADMIN]);
 
     }
 
