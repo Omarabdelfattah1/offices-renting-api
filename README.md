@@ -1,9 +1,11 @@
 ## Tasks
 - [ ] Authentication 
     - [ ] Sanctum
+    - [ ] Email Verfication
+    - [ ] Password Reset
     - [ ] Google
     - [ ] Telegram
 - [ ] Roles and permissions
     - [ ] Create, Update, Delete, switch available (Offices)
 - [ ] Reservation Payment
-    - [ ] Slack integration
+    - [ ] Stripe integration

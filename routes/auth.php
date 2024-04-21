@@ -13,21 +13,22 @@ Route::group(['namespace'=>'Auth'],function(){
 
     Route::post('/login', 'AuthController@login')->name('login');
 
+    Route::post('/logout', 'AuthController@logout')
+        ->middleware('auth:sanctum')
+        ->name('logout');
+
     Route::post('/forgot-password', 'PasswordResetLinkController@store');
 
     Route::post('/reset-password', 'NewPasswordController@store')
         ->middleware('guest')
         ->name('password.store');
 
-    Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class,'__invoke']) // Adjusted route
+    Route::get('/verify-email/{id}/{hash}', 'VerifyEmailController@verify')
         ->middleware('auth:sanctum', 'signed', 'throttle:6,1')
         ->name('verification.verify');
 
-    Route::post('/email/verification-notification', 'EmailVerificationNotificationController@store')
+    Route::post('/email/verification-notification', 'EmailVerificationNotificationController@send')
         ->middleware('auth:sanctum', 'throttle:6,1')
         ->name('verification.send');
 
-    Route::post('/logout', 'AuthController@logout')
-        ->middleware('auth:sanctum')
-        ->name('logout');
 });

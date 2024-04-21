@@ -14,7 +14,7 @@ class RegistrationTest extends TestCase
 
     public function it_register(): void
     {
-        $response = $this->post('/register', [
+        $response = $this->post('api/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'test@example.com',
