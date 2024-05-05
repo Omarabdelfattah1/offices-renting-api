@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,8 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::get("/tags", 'TagsController');
 Route::get("offices",'OfficesController@index');
 Route::get("offices/{office}",'OfficesController@show');
+Route::get('/auth/{driver}/redirect', 'Auth\SocialAuthController@redirect');
+Route::get('/auth/{driver}/callback','Auth\SocialAuthController@callback');
+
 Route::middleware('auth:sanctum')->group(function () {
-    // Offices
+    // Officespl,
     Route::apiResource("offices",'OfficesController')->except(['index','show']);
     // Images
     Route::apiResource("{resource_type}/{resource_id}/images",'ImagesController')->except('show','update');

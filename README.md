@@ -1,11 +1,14 @@
 ## Tasks
 - [ ] Authentication 
-    - [ ] Sanctum
-    - [ ] Email Verfication
-    - [ ] Password Reset
-    - [ ] Google
+    - [X] Sanctum
+    - [X] Email Verfication
+    - [X] Password Reset
+    - [X] Google
     - [ ] Telegram
 - [ ] Roles and permissions
     - [ ] Create, Update, Delete, switch available (Offices)
 - [ ] Reservation Payment
     - [ ] Stripe integration
+- [ ] Notifications
+    - [ ] Real-time - Firebase
+    - [ ] Error Log - Slack

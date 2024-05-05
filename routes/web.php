@@ -1,7 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// use Laravel\Socialite\Facades\Socialite;
 
+// Route::get('/auth/{driver}/redirect', function ($driver) {
+//     if(!in_array($driver,config('services.social_dirvers'))){
+//         abort(404);
+//     }
+//     return Socialite::driver($driver)->redirect();
+// });
+// Route::get('/auth/google/callback', function () {
+//     $user = Socialite::driver('google')->user();
+//     dd( $user);
+// });
 /*
 |--------------------------------------------------------------------------
 | Web Routes
