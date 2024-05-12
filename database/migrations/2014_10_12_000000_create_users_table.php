@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('last_name')->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('phone')->nullable()->unique();
+            $table->string('google_id')->nullable()->unique();
+            $table->string('telegram_id')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->integer('role')->default(User::ROLE_USER);

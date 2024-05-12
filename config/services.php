@@ -36,5 +36,10 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => 'http://localhost:8000/api/auth/google/callback',
     ],
+    'telegram' => [
+        'token' => env('TELEGRAM_ACCESS_TOKEN'),
+        'bot_name' => env('TELEGRAM_BOT_NAME'),
+        'redirect' => env('TELEGRAM_CALLBACK'),
+    ],
 
 ];

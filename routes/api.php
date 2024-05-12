@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\TelegramService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -17,6 +18,9 @@ use Laravel\Socialite\Facades\Socialite;
 Route::get("/tags", 'TagsController');
 Route::get("offices",'OfficesController@index');
 Route::get("offices/{office}",'OfficesController@show');
+Route::get("telegram-login",'Auth\TelegramAuthController@redirect');
+Route::get('telegram-callback', 'Auth\TelegramAuthController@callback');
+Route::get('/auth/telegram/callback','Auth\SocialAuthController@callback');
 Route::get('/auth/{driver}/redirect', 'Auth\SocialAuthController@redirect');
 Route::get('/auth/{driver}/callback','Auth\SocialAuthController@callback');
 
