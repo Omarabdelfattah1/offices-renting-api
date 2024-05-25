@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Office;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->decimal('lng',11,8);
             $table->text('address_line1');
             $table->text('address_line2')->nullable();
-            $table->tinyInteger('approval_status')->default(1);
+            $table->tinyInteger('approval_status')->default(Office::APPROVAL_PENDING);
             $table->boolean('hidden')->default(false);
             $table->float('price_per_day');
             $table->float('monthly_discount')->default(0);
@@ -29,8 +30,8 @@ return new class extends Migration
             $table->softDeletes();
         });
         Schema::create('office_tag',function (Blueprint $table) {
-            $table->foreignId('tag_id')->constraind('tags');
-            $table->foreignId('office_id')->constraind('offices');
+            $table->foreignId('tag_id')->constraind('tags')->cascadeOnDelete();
+            $table->foreignId('office_id')->constraind('offices')->cascadeOnDelete();
             $table->unique(['tag_id','office_id']);
         });
     }

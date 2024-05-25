@@ -26,7 +26,6 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
-        User::factory()->create(['first_name' => 'Super','last_name' => 'Admin','email'=>'admin@admin.com','role'=> User::ROLE_SUPPER_ADMIN]);
 
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Reservation;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->foreignId('office_id')->constraind('offices');
             $table->date('start_date');
             $table->date('end_date');
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->default(Reservation::STATUS_PENDING);
             $table->float('price');
             $table->timestamps();
         });

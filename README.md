@@ -4,8 +4,10 @@
     - [X] Email Verfication
     - [X] Password Reset
     - [X] Google
-    - [ ] Telegram
+    - [X] Telegram
 - [ ] Roles and permissions
+    - [ ] Create, Update, Delete Users
+    - [ ] Create, Update, Delete Roles and Permissions
     - [ ] Create, Update, Delete, switch available (Offices)
 - [ ] Reservation Payment
     - [ ] Stripe integration
